@@ -1,4 +1,4 @@
-# MelodyDots
+# MelodyDots🎶
 
 ## 프로젝트 개요
 
