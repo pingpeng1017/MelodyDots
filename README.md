@@ -19,10 +19,12 @@ MelodyDots 프로젝트는 딥러닝과 점자 변환 기술을 활용하여 음
 
 ## 요구사항(Requirements)
 
-- 프로젝트 환경 및 버전:
-  - Python 버전: 
-  - 필요한 라이브러리 및 버전: 
+- 필수 라이브러리 및 프레임워크:
+  - Numpy
+  - OpenCv
+  - music21 : http://web.mit.edu/music21/
+  - Keras with Tensorflow backend
 
 ## 레퍼런스
 
-- [참고자료 1](https://arxiv.org/pdf/1707.04877v1.pdf)
+- [Optical Music Recognition with Convolutional Sequence-to-Sequence Models](https://arxiv.org/pdf/1707.04877v1.pdf)
