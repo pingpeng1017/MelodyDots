@@ -9,7 +9,7 @@ from keras.optimizers import Adam
 from keras.callbacks import TensorBoard, ModelCheckpoint
 from keras import backend as K
 import tensorflow as tf
-from CTCModel import CTCModel
+from keras_ctcmodel import CTCModel
 import data_generator as datas
 import numpy as np
 import os
@@ -163,8 +163,8 @@ if __name__ =="__main__":
     nb_labels = 15 # 15 symboles pour les octaves
     nb_epochs = 50
     ids=dict()
-    ids['train']=os.listdir(os.path.abspath("../data/train_out_x/"))
-    ids['valid']= os.listdir(os.path.abspath("../data/validation_out_x/"))
+    ids['train']= os.listdir("./data/train_out_x")
+    ids['valid']= os.listdir("./data/validation_out_x")
     batch_size_eval = 16
     train_generator = datas.DataGenerator(ids['train'], "train", batch_size =12, aug_rate = 0.25)
     valid_generator = datas.DataGenerator(ids['valid'],"validation", batch_size = batch_size_eval, aug_rate = 0.25)

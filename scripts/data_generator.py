@@ -113,7 +113,7 @@ class DataGenerator(keras.utils.Sequence):
             if y_temp.shape[0] != 0:
                 image_temp = cv2.imread(images_path +'/'+ ID, cv2.IMREAD_UNCHANGED )
                 if len(image_temp.shape)>2:
-                    	image_temp = cv2.cvtColor(image_temp, cv2.COLOR_BGR2GRAY) 
+                    image_temp = cv2.cvtColor(image_temp, cv2.COLOR_BGR2GRAY) 
                 image_temp = cv2.resize(image_temp,(0,0),fx=0.5,fy=0.5, interpolation =cv2.INTER_CUBIC)
                 image_temp = cv2.resize(image_temp,(0,0),fx=0.5,fy=0.5, interpolation =cv2.INTER_CUBIC).T
                 self.augment_image(image_temp)

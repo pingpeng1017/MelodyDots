@@ -105,7 +105,7 @@ def augment_image(img, aug_rate):
 
 def make_note(note_symbol, octave_symbol):
     switcher = {
-            -1 : note_symbol[0].capitalize(*5)
+            -1 : note_symbol[0].capitalize()*5,
             0 :  note_symbol[0].capitalize()*4,
             1: note_symbol[0].capitalize()*3,
             2: note_symbol[0].capitalize()*2,
@@ -131,14 +131,14 @@ def make_tiny_notation(prediction):
     for i in range (len(prediction["rythms"])):
         if prediction["rythms"][i] == '|':
             if prediction["notes"][parser_notes]!='|':
-                if prediction["notes"][parser_notes-1]=='|' or len(prediction["notes"]) <=len(prediction["rythms"]:
+                if prediction["notes"][parser_notes-1]=='|' or len(prediction["notes"]) <=len(prediction["rythms"]):
                     parser_notes -= 1
-                elif prediction["notes"][parser_notes+1]=='|' or len(prediction["notes"]) <=len(prediction["rythms"]:
+                elif prediction["notes"][parser_notes+1]=='|' or len(prediction["notes"]) <=len(prediction["rythms"]):
                     parser_notes += 1
             if prediction["octaves"][parser_octaves]!='|':
-                if prediction["octaves"][parser_octaves-1]=='|' or len(prediction["octaves"]) <=len(prediction["rythms"]:
+                if prediction["octaves"][parser_octaves-1]=='|' or len(prediction["octaves"]) <=len(prediction["rythms"]):
                     parser_octaves -= 1
-                elif prediction["octaves"][parser_octaves+1]=='|' or len(prediction["octaves"]) <=len(prediction["rythms"]:
+                elif prediction["octaves"][parser_octaves+1]=='|' or len(prediction["octaves"]) <=len(prediction["rythms"]):
                     parser_octaves += 1
             time_by_measure.append(0)
         else:
@@ -147,9 +147,10 @@ def make_tiny_notation(prediction):
                 res.append('r')
             elif prediction["notes"][parser_notes]=='|':
                 if prediction["octaves"][parser_notes]== '|':
+                    pass
                     
             if last_rythm!= prediction["rythms"][i]:
-                res.append(string(int(1/float(prediction["rythms"][i])*4))
+                res.append(str(int(1/float(prediction["rythms"][i])*4)))
                 last_rythm = prediction["rythms"][i]
         parser_notes += 1
         parser_octaves += 1
