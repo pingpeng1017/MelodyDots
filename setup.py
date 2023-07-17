@@ -1,7 +1,7 @@
 import setuptools
 
 
-with open("README.md") as red:
+with open("README.md", encoding="utf-8") as red:
     ldest = red.read()
 
 setuptools.setup(
