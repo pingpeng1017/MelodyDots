@@ -291,7 +291,7 @@ def main():
 
     clear_data() # 이전에 등록된 레이어 데이터 모두 삭제
     mxl_path = extract(args) # 이미지에서 악보 추출하여 MusicXML 생성 및 반환
-    img = teaser() # MusicXML을 시각화한 이미지 생성
+    img = teaser() # 악보 이미지에 바운딩 박스 등 시각화 정보 추가
     img.save(mxl_path.replace(".musicxml", "_teaser.png")) # 시각화한 이미지 저장
 
 
