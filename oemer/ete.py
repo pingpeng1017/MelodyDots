@@ -27,6 +27,7 @@ from oemer.draw_teaser import teaser
 logger = get_logger(__name__)
 
 
+# 체크포인트 파일의 존재 여부 확인을 위한 딕셔너리
 CHECKPOINTS_URL = {
     "1st_model.onnx": "https://github.com/BreezeWhite/oemer/releases/download/checkpoints/1st_model.onnx",
     "1st_weights.h5": "https://github.com/BreezeWhite/oemer/releases/download/checkpoints/1st_weights.h5",
@@ -35,34 +36,37 @@ CHECKPOINTS_URL = {
 }
 
 
-
+# 이전에 등록된 레이어 데이터를 모두 삭제하는 함수
 def clear_data():
     lls = layers.list_layers()
     for l in lls:
         layers.delete_layer(l)
 
 
+# 주어진 이미지에 대해 악보의 줄과 기호 정보를 추출하는 함수
 def generate_pred(img_path, use_tf=False):
     logger.info("Extracting staffline and symbols")
+    # 악보의 줄과 기호 추출 작업 시작
     staff_symbols_map, _ = inference(
-        os.path.join(MODULE_PATH, "checkpoints/unet_big"),
-        img_path,
+        os.path.join(MODULE_PATH, "checkpoints/unet_big"), # unet_big 모델 경로
+        img_path, # 이미지 경로
         use_tf=use_tf,
     )
-    staff = np.where(staff_symbols_map==1, 1, 0)
-    symbols = np.where(staff_symbols_map==2, 1, 0)
+    staff = np.where(staff_symbols_map==1, 1, 0) # 값이 1인 픽셀은 악보의 줄로 표시
+    symbols = np.where(staff_symbols_map==2, 1, 0) # 값이 2인 픽셀은 기호로 표시
 
     logger.info("Extracting layers of different symbols")
-    symbol_thresholds = [0.5, 0.4, 0.4]
+    # 다른 기호들의 레이어 추출 작업 시작
+    symbol_thresholds = [0.5, 0.4, 0.4] # 기호를 추출하기 위한 임계값의 리스트
     sep, _ = inference(
-        os.path.join(MODULE_PATH, "checkpoints/seg_net"),
-        img_path,
+        os.path.join(MODULE_PATH, "checkpoints/seg_net"), # seg_net 모델 경로
+        img_path, # 이미지 경로
         manual_th=None,
         use_tf=use_tf,
     )
-    stems_rests = np.where(sep==1, 1, 0)
-    notehead = np.where(sep==2, 1, 0)
-    clefs_keys = np.where(sep==3, 1, 0)
+    stems_rests = np.where(sep==1, 1, 0) # 값이 1인 픽셀은 쉼표로 표시
+    notehead = np.where(sep==2, 1, 0) # 값이 2인 픽셀은 음표로 표시
+    clefs_keys = np.where(sep==3, 1, 0) # 값이 3인 픽셀은 조표로 표시
     # stems_rests = sep[..., 0]
     # notehead = sep[..., 1]
     # clefs_keys = sep[..., 2]
@@ -70,43 +74,47 @@ def generate_pred(img_path, use_tf=False):
     return staff, symbols, stems_rests, notehead, clefs_keys
 
 
+# 기호 예측 결과를 정제하는 함수
 def polish_symbols(rgb_black_th=300):
-    img = layers.get_layer('original_image')
-    sym_pred = layers.get_layer('symbols_pred')
+    img = layers.get_layer('original_image') # 원본 이미지 가져오기
+    sym_pred = layers.get_layer('symbols_pred') # 기호 예측 결과 가져오기
 
-    img = Image.fromarray(img).resize((sym_pred.shape[1], sym_pred.shape[0]))
-    arr = np.sum(np.array(img), axis=-1)
-    arr = np.where(arr < rgb_black_th, 1, 0)  # Filter background
-    ker = cv2.getStructuringElement(cv2.MORPH_RECT, (1, 3))
-    arr = cv2.dilate(cv2.erode(arr.astype(np.uint8), ker), ker)  # Filter staff lines
-    mix = np.where(sym_pred+arr>1, 1, 0)
+    img = Image.fromarray(img).resize((sym_pred.shape[1], sym_pred.shape[0])) # 이미지 크기 조정
+    arr = np.sum(np.array(img), axis=-1) # 그레이스케일 이미지로 변환
+    arr = np.where(arr < rgb_black_th, 1, 0) # 배경 필터링을 위한 이진화
+    ker = cv2.getStructuringElement(cv2.MORPH_RECT, (1, 3)) # staff line 필터링을 위한 구조 요소 생성
+    arr = cv2.dilate(cv2.erode(arr.astype(np.uint8), ker), ker) # filter staff line 
+    mix = np.where(sym_pred+arr>1, 1, 0) # 기호 예측 결과와 배경 필터링 결과를 합성하여 최종 기호 영역 생성
     return mix
 
 
+# 기호가 있는 영역에 바운딩 박스를 추가해주는 함수
 def register_notehead_bbox(bboxes):
-    symbols = layers.get_layer('symbols_pred')
-    layer = layers.get_layer('bboxes')
+    symbols = layers.get_layer('symbols_pred') # 기호 예측 결과 가져오기
+    layer = layers.get_layer('bboxes') # bboxes 레이어 가져오기
     for (x1, y1, x2, y2) in bboxes:
-        yi, xi = np.where(symbols[y1:y2, x1:x2]>0)
-        yi += y1
+        yi, xi = np.where(symbols[y1:y2, x1:x2]>0) # 기호가 있는 픽셀 좌표 가져오기
+        yi += y1 # 전체 이미지 좌표로 변환
         xi += x1
-        layer[yi, xi] = np.array([x1, y1, x2, y2])
+        layer[yi, xi] = np.array([x1, y1, x2, y2]) # 기호가 있는 영역에 바운딩 박스 정보 등록
     return layer
 
 
+# 기호에 대한 노트 ID를 등록하는 함수
 def register_note_id():
-    symbols = layers.get_layer('symbols_pred')
-    layer = layers.get_layer('note_id')
-    notes = layers.get_layer('notes')
+    symbols = layers.get_layer('symbols_pred') # 기호 예측 결과 가져오기
+    layer = layers.get_layer('note_id') # note_id 레이어 가져오기
+    notes = layers.get_layer('notes') # notes 레이어 가져오기
     for idx, note in enumerate(notes):
-        x1, y1, x2, y2 = note.bbox
-        yi, xi = np.where(symbols[y1:y2, x1:x2]>0)
-        yi += y1
+        x1, y1, x2, y2 = note.bbox # 기호의 바운딩 박스 좌표 가져오기
+        yi, xi = np.where(symbols[y1:y2, x1:x2]>0) # 기호가 있는 픽셀 좌표 가져오기
+        yi += y1 # 전체 이미지 좌표로 변환
         xi += x1
-        layer[yi, xi] = idx
-        notes[idx].id = idx
+        layer[yi, xi] = idx # 기호가 있는 영역에 해당하는 픽셀에 노트 ID 등록
+        notes[idx].id = idx # 노트 객체에 ID 등록
 
 
+# 이미지로부터 악보 정보를 추출하고 MusicXML을 생성하는 함수
 def extract(args):
     img_path = Path(args.img_path)
     f_name = os.path.splitext(img_path.name)[0]
@@ -137,20 +145,21 @@ def extract(args):
             }
             pickle.dump(data, open(pkl_path, "wb"))
 
-    # Load the original image, resize to the same size as prediction.
+    # Load the original image, resize to the same size as prediction
     image = cv2.imread(str(img_path))
     image = cv2.resize(image, (staff.shape[1], staff.shape[0]))
 
     if not args.without_deskew:
         logger.info("Dewarping")
+        # 변형 보정 작업 시작
         coords_x, coords_y = estimate_coords(staff)
         staff = dewarp(staff, coords_x, coords_y)
-        symbols = dewarp(symbols, coords_x, coords_y)
+        symbols = dewarp(symbols, coords_x, coords_y) 
         stems_rests = dewarp(stems_rests, coords_x, coords_y)
         clefs_keys = dewarp(clefs_keys, coords_x, coords_y)
         notehead = dewarp(notehead, coords_x, coords_y)
         for i in range(image.shape[2]):
-            image[..., i] = dewarp(image[..., i], coords_x, coords_y)
+            image[..., i] = dewarp(image[..., i], coords_x, coords_y) # 원본 이미지 보정
 
     # Register predictions
     symbols = symbols + clefs_keys + stems_rests
@@ -164,29 +173,33 @@ def extract(args):
 
     # ---- Extract staff lines and group informations ---- #
     logger.info("Extracting stafflines")
+    # 악보 줄 추출 작업 시작
     staffs, zones = staff_extract()
     layers.register_layer("staffs", staffs)  # Array of 'Staff' instances
-    layers.register_layer("zones", zones)  # Range of each zones, array of 'range' object.
+    layers.register_layer("zones", zones)  # Range of each zones, array of 'range' object
 
     # ---- Extract noteheads ---- #
     logger.info("Extracting noteheads")
+    # 음표 추출 작업 시작
     notes = note_extract()
 
-    # Array of 'NoteHead' instances.
+    # Array of 'NoteHead' instances
     layers.register_layer('notes', np.array(notes))
 
-    # Add a new layer (w * h), indicating note id of each pixel.
+    # Add a new layer (w * h), indicating note id of each pixel
     layers.register_layer('note_id', np.zeros(symbols.shape, dtype=np.int)-1)
     register_note_id()
 
     # ---- Extract groups of note ---- #
     logger.info("Grouping noteheads")
+    # 음표 그룹화 작업 시작
     groups, group_map = group_extract()
     layers.register_layer('note_groups', np.array(groups))
     layers.register_layer('group_map', group_map)
 
     # ---- Extract symbols ---- #
     logger.info("Extracting symbols")
+    # 기호 추출 작업 시작
     barlines, clefs, sfns, rests = symbol_extract()
     layers.register_layer('barlines', np.array(barlines))
     layers.register_layer('clefs', np.array(clefs))
@@ -195,10 +208,12 @@ def extract(args):
 
     # ---- Parse rhythm ---- #
     logger.info("Extracting rhythm types")
+    # 리듬 유형 추출 작업 시작
     rhythm_extract()
 
     # ---- Build MusicXML ---- #
     logger.info("Building MusicXML document")
+    # MusicXML 문서 생성 작업 시작
     basename = os.path.basename(img_path).replace(".jpg", "").replace(".png", "")
     builder = MusicXMLBuilder(title=basename.capitalize())
     builder.build()
@@ -207,7 +222,7 @@ def extract(args):
     # ---- Write out the MusicXML ---- #
     out_path = args.output_path
     if not out_path.endswith(".musicxml"):
-        # Take the output path as the folder.
+        # Take the output path as the folder
         out_path = os.path.join(out_path, basename+".musicxml")
 
     with open(out_path, "wb") as ff:
@@ -216,6 +231,7 @@ def extract(args):
     return out_path
 
 
+# 커맨드 라인 도구에서 사용할 수 있는 인자 파서를 생성하는 함수
 def get_parser():
     parser = argparse.ArgumentParser(
         "Oemer",
@@ -238,6 +254,7 @@ def get_parser():
     return parser
 
 
+# 주어진 URL로부터 파일을 다운로드하는 함수
 def download_file(title, url, save_path):
     resp = urllib.request.urlopen(url)
     length = int(resp.getheader("Content-Length", -1))
@@ -255,27 +272,27 @@ def download_file(title, url, save_path):
 
 
 def main():
-    parser = get_parser()
-    args = parser.parse_args()
+    parser = get_parser() # 명령줄 인수를 파싱하는 파서 객체 생성
+    args = parser.parse_args() # 명령줄 인수를 파싱하여 가져옴
 
     if not os.path.exists(args.img_path):
-        raise FileNotFoundError(f"The given image path doesn't exists: {args.img_path}")
+        raise FileNotFoundError(f"The given image path doesn't exists: {args.img_path}") # 지정된 이미지 경로가 존재하지 않으면 예외 발생
 
     # Check there are checkpoints
     chk_path = os.path.join(MODULE_PATH, "checkpoints/unet_big/model.onnx")
     if not os.path.exists(chk_path):
-        logger.warn("No checkpoint found in %s", chk_path)
+        logger.warn("No checkpoint found in %s", chk_path) # 체크포인트가 없는 경우 경고 메시지 출력
         for idx, (title, url) in enumerate(CHECKPOINTS_URL.items()):
-            logger.info(f"Downloading checkpoints ({idx+1}/{len(CHECKPOINTS_URL)})")
-            save_dir = "unet_big" if title.startswith("1st") else "seg_net"
+            logger.info(f"Downloading checkpoints ({idx+1}/{len(CHECKPOINTS_URL)})") # 체크포인트 다운로드 중인 경우 로그 메시지 출력 
+            save_dir = "unet_big" if title.startswith("1st") else "seg_net" # 체크포인트 저장 디렉토리 결정
             save_dir = os.path.join(MODULE_PATH, "checkpoints", save_dir)
-            save_path = os.path.join(save_dir, title.split("_")[1])
-            download_file(title, url, save_path)
+            save_path = os.path.join(save_dir, title.split("_")[1]) # 체크포인트 저장 경로 결정
+            download_file(title, url, save_path) # 체크포인트 파일 다운로드 함수 호출
 
-    clear_data()
-    mxl_path = extract(args)
-    img = teaser()
-    img.save(mxl_path.replace(".musicxml", "_teaser.png"))
+    clear_data() # 이전에 등록된 레이어 데이터 모두 삭제
+    mxl_path = extract(args) # 이미지에서 악보 추출하여 MusicXML 생성 및 반환
+    img = teaser() # MusicXML을 시각화한 이미지 생성
+    img.save(mxl_path.replace(".musicxml", "_teaser.png")) # 시각화한 이미지 저장
 
 
 if __name__ == "__main__":
