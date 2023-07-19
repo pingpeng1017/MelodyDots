@@ -11,6 +11,7 @@ from .general_filtering_rules import filter_out_of_range_bbox
 
 def get_degree(line):
     return np.rad2deg(np.arctan2(line[3] - line[1], line[2] - line[0]))
+# np.rad2deg() 라디안을 각도로 변환, np.arctan()입력값에 대한 역삼각함수 아크탄젠트 값을 반환
 
 
 def filter_lines(lines, min_degree=75):
@@ -19,6 +20,7 @@ def filter_lines(lines, min_degree=75):
     lines = filter_out_of_range_bbox(lines)
     min_y = min([st.y_upper for st in staffs.reshape(-1, 1).squeeze()])
     max_y = max([st.y_lower for st in staffs.reshape(-1, 1).squeeze()])
+# np.squeeze() 넘파이배열에서 크기가 1인 추가axis를 제거
 
     cands = []
     for line in lines:

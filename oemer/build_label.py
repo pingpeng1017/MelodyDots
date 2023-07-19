@@ -15,8 +15,11 @@ def fill_hole(gt, tar_color):
     assert tar_color in HALF_WHOLE_NOTE
     tar = np.where(gt==tar_color, 1, 0).astype(np.uint8)
     cnts, _ = cv2.findContours(tar, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+    # cv2.findContours(image, mode, method) 흑백 또는 이진화된 이미지를 대상으로 동일한 색 또는 픽셀값(intensity강도)을 갖는 영역의 경계선 정보를 출력
+    # cv2.RETR_TREE 컨투어를 찾는 방법 : 모든 컨투어 라인을 찾고, 모든 상하구조를 구성(그밖에 EXTERNAL, LIST, CCOMP)
+    # cv2.CHAIN_APPROX_SIMPLE 컨투어를 찾을 때 사용하는 근사화 방법 : 컨투어 라인을 그릴 수 있는 포인트만 반환(그밖에 NONE, TC89_L1, TC89_KCOS)
     for cnt in cnts:
-        x, y, w, h = cv2.boundingRect(cnt)
+        x, y, w, h = cv2.boundingRect(cnt) # 컨투어를 둘러싸는 박스를 구하는 함수
 
         # Scan by row
         for yi in range(y, y+h):
