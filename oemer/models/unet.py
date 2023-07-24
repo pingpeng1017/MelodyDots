@@ -59,7 +59,11 @@ def transpose_conv_block(input_tensor, channel, kernel_size, strides=(2, 2), dro
 
 def semantic_segmentation(win_size=256, multi_grid_layer_n=1, multi_grid_n=5, out_class=2, dropout=0.4):
     """Improved U-net model with Atrous Spatial Pyramid Pooling (ASPP) block."""
-    input_score = Input(shape=(win_size, win_size, 3), name="input_score_48")
+    
+    
+    input_score = Input(shape=(win_size, win_size, 3), name="input_score_48") 
+    
+    
     en = Conv2D(2**7, (7, 7), strides=(1, 1), padding="same")(input_score)
 
     en_l1 = conv_block(en, 2**7, (3, 3), strides=(2, 2))

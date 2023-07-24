@@ -20,6 +20,7 @@
 ## 요구사항(Requirements)
 
 - 필수 라이브러리 및 프레임워크:
+  - Python 3.8
   - Numpy
   - OpenCv
   - music21 : http://web.mit.edu/music21/

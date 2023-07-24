@@ -23,11 +23,11 @@ class NoteGroup:
         self.id: int = None
         self.bbox: list[int] = None
         self.note_ids: list[int] = []
-        self.top_note_ids: list[int] = []  # For multi-melody cases
-        self.bottom_note_ids: list[int] = []  # For multi-melody cases
+        self.top_note_ids: list[int] = [] # For multi-melody cases
+        self.bottom_note_ids: list[int] = [] # For multi-melody cases
         self.stem_up: bool = None
         self.has_stem: bool = None
-        self.all_same_type: bool = None  # All notes are solid or hollow
+        self.all_same_type: bool = None # All notes are solid or hollow
         self.group: int = None
         self.track: int = None
 
@@ -71,8 +71,8 @@ def group_noteheads():
         offset = 3
         top = np.min(nys) - offset #unit_size // 2
         bt = np.max(nys) + offset #unit_size // 2
-        left = np.min(nxs)  # - unit_size // 3
-        right = np.max(nxs)  # + unit_size // 3
+        left = np.min(nxs) # - unit_size // 3
+        right = np.max(nxs) # + unit_size // 3
         covered_region = nh_label[top:bt, left:right]
         labels = set(np.unique(covered_region))
         if 0 in labels:
