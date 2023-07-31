@@ -52,6 +52,7 @@ def generate_pred(img_path, use_tf=False):
         img_path, # 이미지 경로
         use_tf=use_tf,
     )
+    
     staff = np.where(staff_symbols_map==1, 1, 0) # 값이 1인 픽셀은 악보의 줄로 표시
     symbols = np.where(staff_symbols_map==2, 1, 0) # 값이 2인 픽셀은 기호로 표시
 
@@ -66,7 +67,7 @@ def generate_pred(img_path, use_tf=False):
     )
     stems_rests = np.where(sep==1, 1, 0) # 값이 1인 픽셀은 쉼표로 표시
     notehead = np.where(sep==2, 1, 0) # 값이 2인 픽셀은 음표로 표시
-    clefs_keys = np.where(sep==3, 1, 0) # 값이 3인 픽셀은 조표로 표시
+    clefs_keys = np.where(sep==3, 1, 0) # 값이 3인 픽셀은 음자리표로 표시
     # stems_rests = sep[..., 0]
     # notehead = sep[..., 1]
     # clefs_keys = sep[..., 2]
@@ -115,8 +116,8 @@ def register_note_id():
 
 
 # 이미지로부터 악보 정보를 추출하고 MusicXML을 생성하는 함수
-def extract(args):
-    img_path = Path(args.img_path)
+def extract(image_path, useTF = True, saveCache = False):
+    img_path = Path(image_path)
     f_name = os.path.splitext(img_path.name)[0]
     pkl_path = img_path.parent / f"{f_name}.pkl"
     if pkl_path.exists():
@@ -129,13 +130,13 @@ def extract(args):
         stems_rests = pred["stems_rests"]
     else:
         # Make predictions
-        if args.use_tf:
+        if useTF:
             ori_inf_type = os.environ.get("INFERENCE_WITH_TF", None)
             os.environ["INFERENCE_WITH_TF"] = "true"
-        staff, symbols, stems_rests, notehead, clefs_keys = generate_pred(str(img_path), use_tf=args.use_tf)
-        if args.use_tf and ori_inf_type is not None:
+        staff, symbols, stems_rests, notehead, clefs_keys = generate_pred(str(img_path), use_tf=useTF)
+        if useTF and ori_inf_type is not None:
             os.environ["INFERENCE_WITH_TF"] = ori_inf_type
-        if args.save_cache:
+        if saveCache:
             data = {
                 'staff': staff,
                 'note': notehead,
@@ -149,17 +150,17 @@ def extract(args):
     image = cv2.imread(str(img_path))
     image = cv2.resize(image, (staff.shape[1], staff.shape[0]))
 
-    if not args.without_deskew:
-        logger.info("Dewarping")
-        # 변형 보정 작업 시작
-        coords_x, coords_y = estimate_coords(staff)
-        staff = dewarp(staff, coords_x, coords_y)
-        symbols = dewarp(symbols, coords_x, coords_y) 
-        stems_rests = dewarp(stems_rests, coords_x, coords_y)
-        clefs_keys = dewarp(clefs_keys, coords_x, coords_y)
-        notehead = dewarp(notehead, coords_x, coords_y)
-        for i in range(image.shape[2]):
-            image[..., i] = dewarp(image[..., i], coords_x, coords_y) # 원본 이미지 보정
+    # if not args.without_deskew:
+    #     logger.info("Dewarping")
+    #     # 변형 보정 작업 시작
+    #     coords_x, coords_y = estimate_coords(staff)
+    #     staff = dewarp(staff, coords_x, coords_y)
+    #     symbols = dewarp(symbols, coords_x, coords_y) 
+    #     stems_rests = dewarp(stems_rests, coords_x, coords_y)
+    #     clefs_keys = dewarp(clefs_keys, coords_x, coords_y)
+    #     notehead = dewarp(notehead, coords_x, coords_y)
+    #     for i in range(image.shape[2]):
+    #         image[..., i] = dewarp(image[..., i], coords_x, coords_y) # 원본 이미지 보정
 
     # Register predictions
     symbols = symbols + clefs_keys + stems_rests
@@ -220,7 +221,7 @@ def extract(args):
     xml = builder.to_musicxml()
 
     # ---- Write out the MusicXML ---- #
-    out_path = args.output_path
+    out_path = "C:\\Users\\Minjoo Lee\\MelodyDots\\docs\\images\\output"
     if not out_path.endswith(".musicxml"):
         # Take the output path as the folder
         out_path = os.path.join(out_path, basename+".musicxml")
@@ -272,11 +273,11 @@ def download_file(title, url, save_path):
 
 
 def main():
-    parser = get_parser() # 명령줄 인수를 파싱하는 파서 객체 생성
-    args = parser.parse_args() # 명령줄 인수를 파싱하여 가져옴
+    # parser = get_parser() # 명령줄 인수를 파싱하는 파서 객체 생성
+    # args = parser.parse_args() # 명령줄 인수를 파싱하여 가져옴
 
-    if not os.path.exists(args.img_path):
-        raise FileNotFoundError(f"The given image path doesn't exists: {args.img_path}") # 지정된 이미지 경로가 존재하지 않으면 예외 발생
+    if not os.path.exists("C:/Users/Minjoo Lee/MelodyDots/docs/images/___page-0001.jpg"):
+        raise FileNotFoundError("C:/Users/Minjoo Lee/MelodyDots/docs/images/___page-0001.jpg") # 지정된 이미지 경로가 존재하지 않으면 예외 발생
 
     # Check there are checkpoints
     chk_path = os.path.join(MODULE_PATH, "checkpoints/unet_big/model.onnx")
@@ -290,7 +291,7 @@ def main():
             download_file(title, url, save_path) # 체크포인트 파일 다운로드 함수 호출
 
     clear_data() # 이전에 등록된 레이어 데이터 모두 삭제
-    mxl_path = extract(args) # 이미지에서 악보 추출하여 MusicXML 생성 및 반환
+    mxl_path = extract("C:/Users/Minjoo Lee/MelodyDots/docs/images/___page-0001.jpg", True, False) # 이미지에서 악보 추출하여 MusicXML 생성 및 반환
     img = teaser() # 악보 이미지에 바운딩 박스 등 시각화 정보 추가
     img.save(mxl_path.replace(".musicxml", "_teaser.png")) # 시각화한 이미지 저장
 

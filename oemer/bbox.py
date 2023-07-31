@@ -32,8 +32,8 @@ def merge_nearby_bbox(bboxes, distance, x_factor=1, y_factor=1):
     model = AgglomerativeClustering(n_clusters=None, distance_threshold=distance, compute_full_tree=True)
     centers = np.array([(bb[0]+bb[2], bb[1]+bb[3]) for bb in bboxes]) / 2
     centers[:, 0] *= x_factor  # Increase/decrease the x distance
-    centers[:, 1] *= y_factor  # Increase/decrease the y distance
     model.fit(centers)
+    centers[:, 1] *= y_factor  # Increase/decrease the y distance
     labels = np.unique(model.labels_)
     new_box = []
     for label in labels:

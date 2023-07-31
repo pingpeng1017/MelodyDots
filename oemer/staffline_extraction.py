@@ -284,6 +284,7 @@ class Staff:
         return (x_dist + y_dist) ** 0.5
 
 
+# 악보가 위치한 영역들을 초기화하는 함수
 def init_zones(staff_pred, splits):
     ys, xs = np.where(staff_pred > 0)
 
@@ -312,15 +313,15 @@ def init_zones(staff_pred, splits):
             zones.append(range(start, end))
             break
         zones.append(range(start, end))
-    return np.array(zones, dtype=object), left_bound, right_bound, bottom_bound
+    return np.array(zones, dtype=object), left_bound, right_bound, bottom_bound # 악보의 영역들이 저장되어 반환
 
 
 def extract(splits=8, line_threshold=0.8, horizontal_diff_th=0.1, unit_size_diff_th=0.1, barline_min_degree=75):
     # Fetch parameters from layers
-    staff_pred = layers.get_layer('staff_pred')
+    staff_pred = layers.get_layer('staff_pred') # 추출된 악보의 줄 정보 가져오기
 
     # Start process
-    zones, *_ = init_zones(staff_pred, splits=splits)
+    zones, *_ = init_zones(staff_pred, splits=splits) # 악보 이미지에서 악보의 위치를 추정
     all_staffs = []
     for rr in zones:
         print(rr[0], rr[-1], end=' ')
@@ -368,6 +369,7 @@ def extract(splits=8, line_threshold=0.8, horizontal_diff_th=0.1, unit_size_diff
     return np.array(all_staffs), zones
 
 
+# staff 객체를 생성하는 함수
 def extract_part(pred, x_offset, line_threshold=0.8):
     # Extract lines
     lines, _ = extract_line(pred, x_offset=x_offset, line_threshold=line_threshold)
@@ -498,6 +500,7 @@ def filter_line_peaks(peaks, norm, max_gap_ratio=1.5):
     return valid_peaks, groups[:-1]
 
 
+# 서로 다른 길이를 가진 staff들을 정렬하는 함수
 def align_staffs(staffs, max_dist_ratio=3):
     len_types = set(len(st_part) for st_part in staffs)
     if len(len_types) == 1:

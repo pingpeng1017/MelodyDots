@@ -373,7 +373,7 @@ def parse_stem_info(notes):
     st_map, _ = scipy.ndimage.label(enhanced_stems)
 
     for note in notes:
-        box = note.bbox
+        box = note.bbox 
         region = st_map[box[1]:box[3], box[0]:box[2]]
         lls = set(np.unique(region))
         if 0 in lls:
@@ -452,7 +452,7 @@ def extract(
         else:
             solid_box.append(box)
 
-    # Assign notes with extracted infromation
+    # Assign notes with extracted information
     logger.info("Instanitiating notes")
     solid_notes = gen_notes(solid_box, symbols)
     hollow_notes = gen_notes(hollow_box, symbols)

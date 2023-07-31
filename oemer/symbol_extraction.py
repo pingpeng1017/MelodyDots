@@ -76,7 +76,7 @@ class Sfn:
     def __init__(self):
         self.bbox: list[int] = None
         self.note_id: int = None
-        self.is_key: bool = None  # Whether is key or accidental
+        self.is_key: bool = None # Whether is key or accidental
         self.track: int = None
         self.group: int = None
         self._label: SfnType = None

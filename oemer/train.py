@@ -36,6 +36,7 @@ def get_cvc_data_paths(dataset_path):
     return data
 
 
+# 데이터셋 폴더 내 이미지와 세그멘테이션 이미지 파일의 경로를 가져오는 함수
 def get_deep_score_data_paths(dataset_path):
     imgs = os.listdir(os.path.join(dataset_path, "images"))
     paths = []
@@ -46,6 +47,7 @@ def get_deep_score_data_paths(dataset_path):
     return paths
 
 
+# 이미지 데이터에 여러가지 증강 기법을 적용하는 함수
 def preprocess_image(img_path):
     image = Image.open(img_path).convert("1")
     params = {}

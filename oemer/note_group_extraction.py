@@ -348,8 +348,8 @@ def post_check_groups(groups):
 def extract():
     # Start process
     logger.debug("Grouping noteheads")
-    groups, group_map = group_noteheads()
 
+    groups, group_map = group_noteheads()
     logger.debug("Analyzing stem direction")
     groups, group_map = parse_stem_direction(groups, group_map)
 

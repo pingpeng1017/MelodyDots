@@ -104,7 +104,7 @@ def inference(model_path, img_path, step_size=128, batch_size=16, manual_th=None
         for idx, th in enumerate(manual_th): # 수동 임계값을 기준으로 클래스 맵 생성
             class_map[..., idx] = np.where(out[..., idx+1]>th, 1, 0)
 
-    return class_map, out
+    return class_map, out # 각 픽셀의 클래스 레이블을 담은 배열과 각 픽셀이 각 클래스에 속할 확률 값
 
 
 # 주어진 이미지 영역과 모델 이름을 이용하여 예측을 수행하는 함수
