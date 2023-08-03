@@ -1,0 +1,155 @@
+input_img:C:\Users\han\AppData\Local\Temp\gradio\14c0d80a8c37bf1fabd18d121b9a8fba5bad2161\image.png
+img_name_path:C:\Users\han\AppData\Local\Temp\gradio\14c0d80a8c37bf1fabd18d121b9a8fba5bad2161\2-2 Breton-Laride temp.png
+args.img_path:C:\Users\han\AppData\Local\Temp\gradio\14c0d80a8c37bf1fabd18d121b9a8fba5bad2161\2-2 Breton-Laride temp.png
+2023-08-03 16:45:41 Extracting staffline and symbols
+C:\Users\han\AppData\Local\Programs\Python\Python311\Lib\site-packages\onnxruntime\capi\onnxruntime_inference_collection.py:65: UserWarning: Specified provider 'CoreMLExecutionProvider' is not in available provider names.Available providers: 'TensorrtExecutionProvider, CUDAExecutionProvider, CPUExecutionProvider'
+  warnings.warn(
+2023-08-03 16:45:42.3391760 [E:onnxruntime:Default, provider_bridge_ort.cc:1351 onnxruntime::TryGetProviderInfo_CUDA] D:\a\_work\1\s\onnxruntime\core\session\provider_bridge_ort.cc:1131 onnxruntime::ProviderLibrary::Get [ONNXRuntimeError] : 1 : FAIL : LoadLibrary failed with error 126 "" when trying to 
+load "C:\Users\han\AppData\Local\Programs\Python\Python311\Lib\site-packages\onnxruntime\capi\onnxruntime_providers_cuda.dll"
+
+2023-08-03 16:45:42.3684040 [W:onnxruntime:Default, onnxruntime_pybind_state.cc:640 onnxruntime::python::CreateExecutionProviderInstance] Failed to create CUDAExecutionProvider. Please reference https://onnxruntime.ai/docs/execution-providers/CUDA-ExecutionProvider.html#requirements to ensure all dependencies are met.
+1612 2280
+2023-08-03 16:51:03 Extracting layers of different symbols
+2023-08-03 16:51:04.3020307 [E:onnxruntime:Default, provider_bridge_ort.cc:1351 onnxruntime::TryGetProviderInfo_CUDA] D:\a\_work\1\s\onnxruntime\core\session\provider_bridge_ort.cc:1131 onnxruntime::ProviderLibrary::Get [ONNXRuntimeError] : 1 : FAIL : LoadLibrary failed with error 126 "" when trying to 
+load "C:\Users\han\AppData\Local\Programs\Python\Python311\Lib\site-packages\onnxruntime\capi\onnxruntime_providers_cuda.dll"
+
+2023-08-03 16:51:04.3422119 [W:onnxruntime:Default, onnxruntime_pybind_state.cc:640 onnxruntime::python::CreateExecutionProviderInstance] Failed to create CUDAExecutionProvider. Please reference https://onnxruntime.ai/docs/execution-providers/CUDA-ExecutionProvider.html#requirements to ensure all dependencies are met.
+1612 2280
+Traceback (most recent call last):
+  File "C:\Users\han\AppData\Local\Programs\Python\Python311\Lib\site-packages\gradio\routes.py", line 442, in run_predict
+    output = await app.get_blocks().process_api(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\han\AppData\Local\Programs\Python\Python311\Lib\site-packages\gradio\blocks.py", line 1392, in process_api
+    result = await self.call_function(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\han\AppData\Local\Programs\Python\Python311\Lib\site-packages\gradio\blocks.py", line 1097, in call_function
+    prediction = await anyio.to_thread.run_sync(
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\han\AppData\Local\Programs\Python\Python311\Lib\site-packages\anyio\to_thread.py", line 33, in run_sync
+    return await get_asynclib().run_sync_in_worker_thread(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\han\AppData\Local\Programs\Python\Python311\Lib\site-packages\anyio\_backends\_asyncio.py", line 877, in run_sync_in_worker_thread     
+    return await future
+           ^^^^^^^^^^^^
+  File "C:\Users\han\AppData\Local\Programs\Python\Python311\Lib\site-packages\anyio\_backends\_asyncio.py", line 807, in run
+    result = context.run(func, *args)
+             ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\han\AppData\Local\Programs\Python\Python311\Lib\site-packages\gradio\utils.py", line 703, in wrapper
+    response = f(*args, **kwargs)
+               ^^^^^^^^^^^^^^^^^^
+  File "d:\python\gradio_test.py", line 47, in oemer
+    mxl_path = ete.extract(args) # 이미지에서 악보 추출하여 MusicXML 생성 및 반환
+               ^^^^^^^^^^^^^^^^^
+  File "C:\Users\han\AppData\Local\Programs\Python\Python311\Lib\site-packages\oemer\ete.py", line 139, in extract
+    staff, symbols, stems_rests, notehead, clefs_keys = generate_pred(str(img_path), use_tf=args.use_tf)
+                                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\han\AppData\Local\Programs\Python\Python311\Lib\site-packages\oemer\ete.py", line 65, in generate_pred
+    sep, _ = inference(
+             ^^^^^^^^^^
+  File "C:\Users\han\AppData\Local\Programs\Python\Python311\Lib\site-packages\oemer\inference.py", line 69, in inference
+    out = model.predict(batch) if use_tf else sess.run(output_names, {'input': batch})[0]
+                                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\han\AppData\Local\Programs\Python\Python311\Lib\site-packages\onnxruntime\capi\onnxruntime_inference_collection.py", line 217, in run  
+    return self._sess.run(output_names, input_feed, run_options)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+onnxruntime.capi.onnxruntime_pybind11_state.Fail: [ONNXRuntimeError] : 1 : FAIL : bad allocation
+input_img:C:\Users\han\AppData\Local\Temp\gradio\858710daccd5cfcc9bb216627f246df291f0766c\image.png
+img_name_path:C:\Users\han\AppData\Local\Temp\gradio\858710daccd5cfcc9bb216627f246df291f0766c\hello_world.png
+args.img_path:C:\Users\han\AppData\Local\Temp\gradio\858710daccd5cfcc9bb216627f246df291f0766c\hello_world.png
+2023-08-03 16:51:48 Extracting staffline and symbols
+C:\Users\han\AppData\Local\Programs\Python\Python311\Lib\site-packages\onnxruntime\capi\onnxruntime_inference_collection.py:65: UserWarning: Specified provider 'CoreMLExecutionProvider' is not in available provider names.Available providers: 'TensorrtExecutionProvider, CUDAExecutionProvider, CPUExecutionProvider'
+  warnings.warn(
+2023-08-03 16:51:49.1347217 [E:onnxruntime:Default, provider_bridge_ort.cc:1351 onnxruntime::TryGetProviderInfo_CUDA] D:\a\_work\1\s\onnxruntime\core\session\provider_bridge_ort.cc:1131 onnxruntime::ProviderLibrary::Get [ONNXRuntimeError] : 1 : FAIL : LoadLibrary failed with error 1455 "" when trying to load "C:\Users\han\AppData\Local\Programs\Python\Python311\Lib\site-packages\onnxruntime\capi\onnxruntime_providers_cuda.dll"
+
+2023-08-03 16:51:49.1864330 [W:onnxruntime:Default, onnxruntime_pybind_state.cc:640 onnxruntime::python::CreateExecutionProviderInstance] Failed to create CUDAExecutionProvider. Please reference https://onnxruntime.ai/docs/execution-providers/CUDA-ExecutionProvider.html#requirements to ensure all dependencies are met.
+1611 2281
+2023-08-03 16:51:51.8209165 [E:onnxruntime:, sequential_executor.cc:514 onnxruntime::ExecuteKernel] Non-zero status code returned while running Conv node. Name:'model/conv2d/BiasAdd:0_nchwc' Status Message: D:\a\_work\1\s\onnxruntime\core\framework\bfc_arena.cc:368 onnxruntime::BFCArena::AllocateRawInternal Failed to allocate memory for requested buffer of size 536870912
+
+Traceback (most recent call last):
+  File "C:\Users\han\AppData\Local\Programs\Python\Python311\Lib\site-packages\gradio\routes.py", line 442, in run_predict
+    output = await app.get_blocks().process_api(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\han\AppData\Local\Programs\Python\Python311\Lib\site-packages\gradio\blocks.py", line 1392, in process_api
+    result = await self.call_function(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\han\AppData\Local\Programs\Python\Python311\Lib\site-packages\gradio\blocks.py", line 1097, in call_function
+    prediction = await anyio.to_thread.run_sync(
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\han\AppData\Local\Programs\Python\Python311\Lib\site-packages\anyio\to_thread.py", line 33, in run_sync
+    return await get_asynclib().run_sync_in_worker_thread(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\han\AppData\Local\Programs\Python\Python311\Lib\site-packages\anyio\_backends\_asyncio.py", line 877, in run_sync_in_worker_thread     
+    return await future
+           ^^^^^^^^^^^^
+  File "C:\Users\han\AppData\Local\Programs\Python\Python311\Lib\site-packages\anyio\_backends\_asyncio.py", line 807, in run
+    result = context.run(func, *args)
+             ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\han\AppData\Local\Programs\Python\Python311\Lib\site-packages\gradio\utils.py", line 703, in wrapper
+    response = f(*args, **kwargs)
+               ^^^^^^^^^^^^^^^^^^
+  File "d:\python\gradio_test.py", line 47, in oemer
+    mxl_path = ete.extract(args) # 이미지에서 악보 추출하여 MusicXML 생성 및 반환
+               ^^^^^^^^^^^^^^^^^
+  File "C:\Users\han\AppData\Local\Programs\Python\Python311\Lib\site-packages\oemer\ete.py", line 139, in extract
+    staff, symbols, stems_rests, notehead, clefs_keys = generate_pred(str(img_path), use_tf=args.use_tf)
+                                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\han\AppData\Local\Programs\Python\Python311\Lib\site-packages\oemer\ete.py", line 54, in generate_pred
+    staff_symbols_map, _ = inference(
+                           ^^^^^^^^^^
+  File "C:\Users\han\AppData\Local\Programs\Python\Python311\Lib\site-packages\oemer\inference.py", line 69, in inference
+    out = model.predict(batch) if use_tf else sess.run(output_names, {'input': batch})[0]
+                                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\han\AppData\Local\Programs\Python\Python311\Lib\site-packages\onnxruntime\capi\onnxruntime_inference_collection.py", line 217, in run  
+    return self._sess.run(output_names, input_feed, run_options)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+onnxruntime.capi.onnxruntime_pybind11_state.RuntimeException: [ONNXRuntimeError] : 6 : RUNTIME_EXCEPTION : Non-zero status code returned while running Conv node. Name:'model/conv2d/BiasAdd:0_nchwc' Status Message: D:\a\_work\1\s\onnxruntime\core\framework\bfc_arena.cc:368 onnxruntime::BFCArena::AllocateRawInternal Failed to allocate memory for requested buffer of size 536870912
+
+input_img:C:\Users\han\AppData\Local\Temp\gradio\858710daccd5cfcc9bb216627f246df291f0766c\image.png
+img_name_path:C:\Users\han\AppData\Local\Temp\gradio\858710daccd5cfcc9bb216627f246df291f0766c\hello_world.png
+args.img_path:C:\Users\han\AppData\Local\Temp\gradio\858710daccd5cfcc9bb216627f246df291f0766c\hello_world.png
+2023-08-03 16:53:37 Extracting staffline and symbols
+C:\Users\han\AppData\Local\Programs\Python\Python311\Lib\site-packages\onnxruntime\capi\onnxruntime_inference_collection.py:65: UserWarning: Specified provider 'CoreMLExecutionProvider' is not in available provider names.Available providers: 'TensorrtExecutionProvider, CUDAExecutionProvider, CPUExecutionProvider'
+  warnings.warn(
+2023-08-03 16:53:37.6235403 [E:onnxruntime:Default, provider_bridge_ort.cc:1351 onnxruntime::TryGetProviderInfo_CUDA] D:\a\_work\1\s\onnxruntime\core\session\provider_bridge_ort.cc:1131 onnxruntime::ProviderLibrary::Get [ONNXRuntimeError] : 1 : FAIL : LoadLibrary failed with error 1455 "" when trying to load "C:\Users\han\AppData\Local\Programs\Python\Python311\Lib\site-packages\onnxruntime\capi\onnxruntime_providers_cuda.dll"
+
+2023-08-03 16:53:37.6873920 [W:onnxruntime:Default, onnxruntime_pybind_state.cc:640 onnxruntime::python::CreateExecutionProviderInstance] Failed to create CUDAExecutionProvider. Please reference https://onnxruntime.ai/docs/execution-providers/CUDA-ExecutionProvider.html#requirements to ensure all dependencies are met.
+2023-08-03 16:53:40.0917384 [E:onnxruntime:, inference_session.cc:1645 onnxruntime::InferenceSession::Initialize::<lambda_eb486adf513608dcd45c034ea7ffb8e8>::operator ()] Exception during initialization: bad allocation
+Traceback (most recent call last):
+  File "C:\Users\han\AppData\Local\Programs\Python\Python311\Lib\site-packages\gradio\routes.py", line 442, in run_predict
+    output = await app.get_blocks().process_api(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\han\AppData\Local\Programs\Python\Python311\Lib\site-packages\gradio\blocks.py", line 1392, in process_api
+    result = await self.call_function(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\han\AppData\Local\Programs\Python\Python311\Lib\site-packages\gradio\blocks.py", line 1097, in call_function
+    prediction = await anyio.to_thread.run_sync(
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\han\AppData\Local\Programs\Python\Python311\Lib\site-packages\anyio\to_thread.py", line 33, in run_sync
+    return await get_asynclib().run_sync_in_worker_thread(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\han\AppData\Local\Programs\Python\Python311\Lib\site-packages\anyio\_backends\_asyncio.py", line 877, in run_sync_in_worker_thread     
+    return await future
+           ^^^^^^^^^^^^
+  File "C:\Users\han\AppData\Local\Programs\Python\Python311\Lib\site-packages\anyio\_backends\_asyncio.py", line 807, in run
+    result = context.run(func, *args)
+             ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\han\AppData\Local\Programs\Python\Python311\Lib\site-packages\gradio\utils.py", line 703, in wrapper
+    response = f(*args, **kwargs)
+               ^^^^^^^^^^^^^^^^^^
+  File "d:\python\gradio_test.py", line 47, in oemer
+    mxl_path = ete.extract(args) # 이미지에서 악보 추출하여 MusicXML 생성 및 반환
+               ^^^^^^^^^^^^^^^^^
+  File "C:\Users\han\AppData\Local\Programs\Python\Python311\Lib\site-packages\oemer\ete.py", line 139, in extract
+    staff, symbols, stems_rests, notehead, clefs_keys = generate_pred(str(img_path), use_tf=args.use_tf)
+                                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\han\AppData\Local\Programs\Python\Python311\Lib\site-packages\oemer\ete.py", line 54, in generate_pred
+    staff_symbols_map, _ = inference(
+                           ^^^^^^^^^^
+  File "C:\Users\han\AppData\Local\Programs\Python\Python311\Lib\site-packages\oemer\inference.py", line 43, in inference
+    sess = rt.InferenceSession(onnx_path, providers=providers)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\han\AppData\Local\Programs\Python\Python311\Lib\site-packages\onnxruntime\capi\onnxruntime_inference_collection.py", line 383, in __init__
+    self._create_inference_session(providers, provider_options, disabled_optimizers)
+  File "C:\Users\han\AppData\Local\Programs\Python\Python311\Lib\site-packages\onnxruntime\capi\onnxruntime_inference_collection.py", line 435, in _create_inference_session
+    sess.initialize_session(providers, provider_options, disabled_optimizers)
+onnxruntime.capi.onnxruntime_pybind11_state.RuntimeException: [ONNXRuntimeError] : 6 : RUNTIME_EXCEPTION : Exception during initialization: bad allocation
