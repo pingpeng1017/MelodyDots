@@ -25,7 +25,3 @@
   - OpenCv
   - music21 : http://web.mit.edu/music21/
   - Keras with Tensorflow backend
-
-## 레퍼런스
-
-- [Optical Music Recognition with Convolutional Sequence-to-Sequence Models](https://arxiv.org/pdf/1707.04877v1.pdf)
