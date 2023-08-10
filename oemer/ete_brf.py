@@ -24,7 +24,7 @@ from oemer.build_system import MusicXMLBuilder
 from oemer.draw_teaser import teaser
 
 import music21
-from music21 import *    #pip install music21
+from music21 import *    # pip install music21
 
 
 logger = get_logger(__name__)
@@ -67,9 +67,9 @@ def generate_pred(img_path, use_tf=False):
         manual_th=None,
         use_tf=use_tf,
     )
-    stems_rests = np.where(sep==1, 1, 0) # 값이 1인 픽셀은 쉼표로 표시
-    notehead = np.where(sep==2, 1, 0) # 값이 2인 픽셀은 음표로 표시
-    clefs_keys = np.where(sep==3, 1, 0) # 값이 3인 픽셀은 조표로 표시
+    stems_rests = np.where(sep==1, 1, 0) # 값이 1인 픽셀은 기둥과 쉼표로 표시
+    notehead = np.where(sep==2, 1, 0)# 값이 2인 픽셀은 음표 머리로 표시
+    clefs_keys = np.where(sep==3, 1, 0) # 값이 3인 픽셀은 음자리표와 조표로 표시
     # stems_rests = sep[..., 0]
     # notehead = sep[..., 1]
     # clefs_keys = sep[..., 2]

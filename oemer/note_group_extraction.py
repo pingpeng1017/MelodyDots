@@ -362,7 +362,7 @@ def extract():
 
 
 def predict_symbols():
-    pred = layers.get_layer('celfs_keys_pred')  # sfn -> sharp, flat, natural
+    pred = layers.get_layer('clefs_keys_pred')  # sfn -> sharp, flat, natural
     #pred = layers.get_layer('stems_rests_pred')
     bboxes = get_bbox(pred)
     bboxes = merge_nearby_bbox(bboxes, 15)

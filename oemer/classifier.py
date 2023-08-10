@@ -4,7 +4,7 @@ from pathlib import Path
 from PIL import Image
 import pickle
 
-# import tensorflow as tf
+import tensorflow as tf
 import augly.image as imaugs
 import numpy as np
 from sklearn import svm
@@ -18,6 +18,7 @@ from oemer.bbox import get_bbox, merge_nearby_bbox, draw_bounding_boxes, rm_merg
 from oemer.build_label import find_example
 
 
+# SVM 분류기의 하이퍼파라미터 그리드 정의
 SVM_PARAM_GRID = {
     'degree': [2, 3, 4],
     'decision_function_shape': ['ovo', 'ovr'],
@@ -25,14 +26,17 @@ SVM_PARAM_GRID = {
     'gamma':[0.0001, 0.001, 0.1, 1],
     'kernel':['rbf', 'poly']
 }
+# 이미지의 크기 정의
 TARGET_WIDTH = 40
 TARGET_HEIGHT = 70
 DISTANCE = 10
 
+# 데이터셋의 경로 정의
 DATASET_PATH = "./ds2_dense/segmentation"
 
 
-def _collect(color, out_path, samples=100):
+# 지정된 색상에 해당하는 데이터를 수집하여 저장하는 함수
+def _collect(color, out_path, samples=5):
     out_path = Path(out_path)
     if not out_path.exists():
         out_path.mkdir()
@@ -41,14 +45,17 @@ def _collect(color, out_path, samples=100):
     add_space = 10
     idx = 0
     while cur_samples < samples:
+        # 해당 색상에 해당하는 데이터를 찾는다.
         arr = find_example(DATASET_PATH, color)
         if arr is None:
             continue
         arr[arr!=200] = 0
+        # Bounding box를 얻어온다.
         boxes = get_bbox(arr)
         if len(boxes) > 1:
             boxes = merge_nearby_bbox(boxes, DISTANCE)
         boxes = rm_merge_overlap_bbox(boxes)
+        # Bounding box를 활용하여 데이터를 추출하고 증강한다.
         for box in boxes:
             if idx >= samples:
                 break
@@ -65,32 +72,50 @@ def _collect(color, out_path, samples=100):
             Image.fromarray(img.astype(np.uint8)).save(out_path / f"{idx}.png")
             idx += 1
 
+
         cur_samples += len(boxes)
     print()
 
 
-def collect_data(samples=400):
+# 데이터를 수집하여 train과 test 데이터를 생성하는 함수
+def collect_data(samples=5):
     color_map = {
-        74: "sharp",
-        70: "flat",
-        72: "natural",
-        97: 'rest_whole',
-        98: 'rest_half',
-        99: 'rest_quarter',
-        100: 'rest_8th',
-        101: 'rest_16th',
-        102: 'rest_32nd',
-        103: 'rest_64th',
-        10: 'gclef',
-        13: 'fclef',
+        # 74: "sharp",
+        # 70: "flat",
+        # 72: "natural",
+        # 97: 'rest_whole',
+        # 98: 'rest_half',
+        # 99: 'rest_quarter',
+        # 100: 'rest_8th',
+        # 101: 'rest_16th',
+        # 102: 'rest_32nd',
+        # 103: 'rest_64th',
+        # 10: 'gclef',
+        # 13: 'fclef',
+        # 추가: time signature에 해당하는 데이터
+        # 21: 'timesig_0',
+        # 22: 'timesig_1',
+        # 23: 'timesig_2',
+        24: 'timesig_3',
+        25: 'timesig_4',
+        26: 'timesig_5',
+        27: 'timesig_6',
+        # 28: 'timesig_7',
+        # 29: 'timesig_8',
+        # 30: 'timesig_9',
+        # 33: 'timesig_4_4',
+        # 34: 'timesig_2_2',
     }
+    
 
+    # color_map에 정의된 색상에 해당하는 데이터를 수집하여 저장
     for color, name in color_map.items():
         print('Current', name)
         _collect(color, f"train_data/{name}", samples=samples)
         _collect(color, f"test_data/{name}", samples=samples)
 
 
+# 모델을 학습하는 함수
 def train(folders):
     class_map = {idx: Path(ff).name for idx, ff in enumerate(folders)}
     train_x = []
@@ -110,17 +135,18 @@ def train(folders):
             idx += 1
 
     print("Train model")
-    model = svm.SVC()#C=0.1, gamma=0.0001, kernel='poly', degree=2, decision_function_shape='ovo')
+    # model = svm.SVC()#C=0.1, gamma=0.0001, kernel='poly', degree=2, decision_function_shape='ovo')
     #model = AdaBoostClassifier(n_estimators=50)
     #model = BaggingClassifier(n_estimators=50)  # For sfn classification
     #model = RandomForestClassifier(n_estimators=50)
     #model = GradientBoostingClassifier(n_estimators=50, verbose=1)
-    #model = GridSearchCV(svm.SVC(), SVM_PARAM_GRID)
+    model = GridSearchCV(svm.SVC(), SVM_PARAM_GRID)
     #model = KNeighborsClassifier(n_neighbors=len(folders))#, weights='distance')
     model.fit(train_x, train_y)
     return model, class_map
 
 
+# TensorFlow 기반의 모델을 학습하는 함수
 def train_tf(folders):
     class_map = {idx: Path(ff).name for idx, ff in enumerate(folders)}
     train_x = []
@@ -168,10 +194,11 @@ def train_tf(folders):
     return model, class_map
 
 
+# 테스트 데이터를 사용하여 모델을 평가하는 함수
 def test(model, folders):
     test_x = []
     test_y = []
-    samples = 100
+    samples = 5
     print("Loading data")
     for cidx, folder in enumerate(folders):
         folder = Path(folder)
@@ -194,6 +221,7 @@ def test(model, folders):
     print("Accuracy: ", acc)
 
 
+# TensorFlow 기반의 모델을 평가하는 함수
 def test_tf(model, folders):
     test_x = []
     test_y = []
@@ -224,9 +252,11 @@ def test_tf(model, folders):
     print("Accuracy: ", acc)
 
 
+# 이미지를 입력으로 받아 해당 이미지가 어떤 클래스에 해당하는지 예측하는 함수
 def predict(region, model_name):
     if np.max(region) == 1:
         region *= 255
+    # 저장된 학습된 모델 로드
     m_info = pickle.load(open(f"sklearn_models/{model_name}.model", "rb"))
     model = m_info['model']
     w = m_info['w']
@@ -237,13 +267,16 @@ def predict(region, model_name):
 
 
 if __name__ == "__main__":
-    samples = 400
-    # collect_data(samples=samples)
+    samples = 5
+    # 데이터를 수집하여 train과 test 데이터 생성
+    collect_data(samples=samples)
 
     # folders = ["gclef", "fclef"]; model_name = "clef"
     # folders = ["sharp", "flat", "natural"]; model_name = "sfn"
-    folders = ["rest_whole", "rest_quarter", "rest_8th"]; model_name = "rests"
+    # folders = ["rest_whole", "rest_quarter", "rest_8th"]; model_name = "rests"
     # folders = ["rest_8th", "rest_16th", "rest_32nd", "rest_64th"]; model_name = "rests_above8"
+    # 박자표 데이터의 폴더와 모델 이름 지정
+    folders = ["timesig_0", "timesig_1", "timesig_2", "timesig_3", "timesig_4", "timesig_5", "timesig_6", "timesig_7", "timesig_8", "timesig_9", "timesig_4_4", "timesig_2_2"]; model_name = "timesigs"
 
     #folders = ['clefs', 'sfns']; model_name = 'clefs_sfns'
     #folders = ["rest_whole", "rest_half", "rest_quarter", "rest_8th", "rest_16th", "rest_32nd", "rest_64th"]
@@ -256,5 +289,6 @@ if __name__ == "__main__":
     # model, class_map = train_tf([f"train_data/{folder}" for folder in folders])
     # test_tf(model, [f"test_data/{folder}" for folder in folders])
 
+    # 학습된 모델 저장
     output = {'model': model, 'w': TARGET_WIDTH, 'h': TARGET_HEIGHT, 'class_map': class_map}
     pickle.dump(output, open(f"oemer/sklearn_models/{model_name}.model", "wb"))

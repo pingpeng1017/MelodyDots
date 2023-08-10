@@ -2,6 +2,7 @@ import random
 import os
 from PIL import Image, ImageColor
 from multiprocessing import Process, Queue
+import multiprocessing as mp
 
 import cv2
 import numpy as np
@@ -9,9 +10,10 @@ import tensorflow as tf
 import tensorflow_addons as tfa
 import augly.image as imaugs
 
-from .build_label import build_label
-from .models.unet import semantic_segmentation, u_net
-from .constant import CHANNEL_NUM
+
+from build_label import build_label
+from models.unet import semantic_segmentation, u_net
+from constant import CHANNEL_NUM
 
 
 
@@ -354,11 +356,13 @@ class DsDataLoader:
         if output_shapes is None:
             output_shapes = ((self.win_size, self.win_size, 3), (self.win_size, self.win_size, CHANNEL_NUM))
 
-        return tf.data.Dataset.from_generator(
-                gen_wrapper, output_types=output_types, output_shapes=output_shapes
-            ) \
-            .batch(batch_size, drop_remainder=True) \
-            .prefetch(tf.data.experimental.AUTOTUNE)
+        dataset = tf.data.Dataset.from_generator(
+            gen_wrapper, output_types=output_types, output_shapes=output_shapes
+        )
+        dataset = dataset.batch(batch_size, drop_remainder=True)
+        dataset = dataset.prefetch(tf.data.experimental.AUTOTUNE)
+
+        return dataset
 
 
 def lr_scheduler(epoch, lr, update_after=5, dec_every=3, dec_rate=0.5):
@@ -409,18 +413,8 @@ def focal_tversky_loss(y_true, y_pred, fw=0.7, alpha=0.7, smooth=1., gamma=0.75)
     return fw*focal_loss + (1-fw)*t_loss
 
 
-def train_model(
-    dataset_path,
-    win_size=288,
-    train_val_split=0.1,
-    learning_rate=5e-4,
-    epochs=15,
-    steps=1000,
-    batch_size=8,
-    val_steps=200,
-    val_batch_size=8,
-    early_stop=8
-):
+def train_model(dataset_path, win_size, train_val_split, learning_rate, epochs, steps,
+                batch_size, val_steps, val_batch_size, early_stop):
     # feat_files = get_cvc_data_paths(dataset_path)
     feat_files = get_deep_score_data_paths(dataset_path)
     random.shuffle(feat_files)
@@ -446,7 +440,7 @@ def train_model(
     #model = naive_conv(win_size=win_size)
     #model = u_net(win_size=win_size, out_class=CHANNEL_NUM)
     model = semantic_segmentation(win_size=win_size, out_class=CHANNEL_NUM)
-    optim = tf.keras.optimizers.Adam(learning_rate=WarmUpLearningRate(learning_rate))
+    optim = tf.keras.optimizers.Adam(learning_rate=5e-07)
     #loss = tf.keras.losses.BinaryCrossentropy(label_smoothing=0.1)
     #loss = tf.keras.losses.CategoricalCrossentropy()
     loss = tfa.losses.SigmoidFocalCrossEntropy()
@@ -563,13 +557,29 @@ def morph_notehead(note, size=(11, 8)):
     return cv2.dilate(out, kernel)
 
 
-if __name__ == "__main__":
-    dataset_path = "/mnt/data/dataset/CvcMuscima-Distortions"
-    dataset_path = "/media/kohara/ADATA HV620S/dataset/ds2_dense"
-    # dataset_path = "/media/ds2_dense"
+if __name__ == '__main__':
+    dataset_path = "C:/Users/Minjoo Lee/MelodyDots/oemer/ds2_dense"
+    win_size = 288
+    train_val_split = 0.1
+    learning_rate = 5e-4
+    epochs = 15
+    steps = 1000
+    batch_size = 8
+    val_steps = 200
+    val_batch_size = 8
+    early_stop = 8
+    
+    train_model(dataset_path, win_size, train_val_split, learning_rate, epochs, steps,
+                batch_size, val_steps, val_batch_size, early_stop)
 
-    #manual_th = [0.5, 0.3, 0.3]
-    manual_th = None
+    
+# if __name__ == "__main__":
+    # dataset_path = "/mnt/data/dataset/CvcMuscima-Distortions"
+    # dataset_path = "C:/Users/Minjoo Lee/MelodyDots/oemer/ds2_dense"
+    # # dataset_path = "/media/ds2_dense"
 
-    f_name = "../test_imgs/River/2.jpg"
-    class_map, out = inference("staffline_only", f_name, manual_th=manual_th)
+    # #manual_th = [0.5, 0.3, 0.3]
+    # manual_th = None
+
+    # f_name = "../test_imgs/River/2.jpg"
+    # class_map, out = inference("staffline_only", f_name, manual_th=manual_th)

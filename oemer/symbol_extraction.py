@@ -48,6 +48,21 @@ class RestType(enum.Enum):
     HALF = 8
 
 
+class TimeSigType(enum.Enum):
+    TIMESIG_0 = 1
+    TIMESIG_1 = 2
+    TIMESIG_2 = 3
+    TIMESIG_3 = 4
+    TIMESIG_4 = 5
+    TIMESIG_5 = 6
+    TIMESIG_6 = 7
+    TIMESIG_7 = 8
+    TIMESIG_8 = 9
+    TIMESIG_9 = 10
+    TIMESIG_4_4 = 11
+    TIMESIG_2_2 = 12
+
+
 class Clef:
     def __init__(self):
         self.bbox: list[int] = None
@@ -123,6 +138,30 @@ class Rest:
     def __repr__(self):
         return f"Rest: {self.label.name} / Has dot: {self.has_dot} / Track: {self.track}" \
             f" / Group: {self.group}"
+
+
+class TimeSig:
+    def __init__(self):
+        self.bbox: list[int] = None
+        self.track: int = None
+        self.group: int = None
+        self._label: TimeSigType = None
+
+    @property
+    def label(self):
+        return self._label
+
+    @label.setter
+    def label(self, val):
+        assert isinstance(val, TimeSigType)
+        self._label = val
+
+    @property
+    def x_center(self):
+        return (self.bbox[0] + self.bbox[2]) / 2
+
+    def __repr__(self):
+        return f"TimeSig: {self.label.name} / Track: {self.track} / Group: {self.group}"
 
 
 class Barline:
@@ -239,7 +278,8 @@ def filter_clef_box(bboxes):
 def parse_clefs_keys(clefs_keys, unit_size, clef_size_ratio=3.5, max_clef_tp_ratio=0.45):
     global cs_img
     cs_img = to_rgb_img(clefs_keys)
-
+    
+    cv2.imwrite("test11.bmp")
     ker = np.ones((np.int(unit_size//2), 1), dtype=np.uint8)
     clefs_keys = cv2.erode(cv2.dilate(clefs_keys.astype(np.uint8), ker), ker)
     bboxes = get_bbox(clefs_keys)
@@ -321,6 +361,37 @@ def parse_rests(line_box, unit_size):
         label.append(pred)
 
     return valid_box, label
+
+
+def parse_timesigs(group_map, stems_rests, symbols, min_height_unit_ratio=3.75):
+    barline_cand = np.where(stems_rests - group_map > 1, 1, 0)
+    no_note = np.where(symbols - group_map > 1, 1, 0)
+
+    # 심볼과 같은 영역을 탐지하기 위해 각 영역을 라벨링
+    bar_label, bnum = scipy.ndimage.label(barline_cand)
+    sym_label, _ = scipy.ndimage.label(no_note)
+
+    # 겹치는 심볼과 박자표 영역을 체크하고 심볼과 겹치는 박자표 부분 제거
+    sym_barline_map = np.zeros_like(no_note)
+    for i in range(1, bnum + 1):
+        idx = (bar_label == i)
+        region = sym_label[idx]
+        labels = set(np.unique(region))
+        if 0 in labels:
+            labels.remove(0)
+        for label in labels:
+            sym_idx = (sym_label == label)
+            sym_barline_map[sym_idx] += no_note[sym_idx]
+    sym_barline_map[sym_barline_map > 0] = 1
+
+    # 박자표 영역을 추출하여 리스트로 반환
+    lines = find_lines(sym_barline_map)
+    line_box = filter_barlines(lines, min_height_unit_ratio)
+    logger.debug("Detected barlines: %d", len(line_box))
+
+    timesigs = gen_timesigs(line_box, symbols)
+
+    return timesigs
 
 
 def gen_barlines(bboxes):
@@ -424,6 +495,24 @@ def gen_rests(bboxes, labels):
     return rests
 
 
+def gen_timesigs(bboxes, symbols):
+    time_sigs = []
+    for box in bboxes:
+        st1, _ = find_closest_staffs(*get_center(box))
+        ts = TimeSig()
+        ts.bbox = box
+        ts.track = st1.track
+        ts.group = st1.group
+
+        # 박자표 이미지 영역에서 추론하여 박자표 레이블 할당
+        region = symbols[box[1]:box[3], box[0]:box[2]]
+        ts.label = predict(region, "timesigs")  # 예측 함수명은 가정하고 작성
+
+        time_sigs.append(ts)
+
+    return time_sigs
+
+
 def extract(min_barline_h_unit_ratio=3.75):
     # Fetch paramters
     symbols = layers.get_layer('symbols_pred')
@@ -441,8 +530,13 @@ def extract(min_barline_h_unit_ratio=3.75):
 
     rest_box, rest_label = parse_rests(line_box, unit_size)
     rests = gen_rests(rest_box, rest_label)
-
-    return barlines, clefs, sfns, rests
+    
+    timesigs_box = parse_timesigs(group_map, stems_rests, symbols, min_height_unit_ratio=min_barline_h_unit_ratio)
+    timesigs = gen_timesigs(timesigs_box)
+    
+    
+    show(barlines)
+    return barlines, clefs, sfns, rests, timesigs
 
 
 def draw_symbols(symbols, ori_img, labels=None, color=(235, 64, 52)):
@@ -471,9 +565,12 @@ if __name__ == "__main__":
     idx = np.where(stems_rests>0)
     img[idx[0], idx[1]] = 0
 
-    barlines, clefs, sfns, rests = extract()
+    barlines, clefs, sfns, rests, timesigs = extract()
 
     aa = draw_symbols(clefs, ori_img)
     bb = draw_symbols(rests, aa, color=(11, 163, 0))
     cc = draw_symbols(sfns, bb, color=(53, 0, 168))
-    dd = draw_bounding_boxes([b.bbox for b in barlines], cc, color=(250, 0, 200))
+    dd = draw_symbols(timesigs, cc, color=(0, 0, 255))
+    ee = draw_bounding_boxes([b.bbox for b in barlines], dd, color=(250, 0, 200))
+
+ 

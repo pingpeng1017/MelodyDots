@@ -5,7 +5,7 @@ from PIL import Image
 import cv2
 import numpy as np
 
-from .constant_min import CLASS_CHANNEL_MAP
+from constant_min import CLASS_CHANNEL_MAP
 
 
 HALF_WHOLE_NOTE = [39, 41, 42, 43, 45, 46, 47, 49]

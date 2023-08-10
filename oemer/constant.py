@@ -1,6 +1,7 @@
 from enum import Enum, auto
 
 
+# 여러가지 악보 요소들의 색상 채널을 그룹으로 묶은 리스트
 CLASS_CHANNEL_LIST = [
     [165, 2],  # staff, ledgerLine
     [35, 37, 38],  # noteheadBlack
@@ -18,11 +19,14 @@ CLASS_CHANNEL_LIST = [
     [25, 24, 29, 22, 23, 28, 27, 34, 30, 21, 33, 26],  # timeSigs
 ]
 
+
 CLASS_CHANNEL_MAP = {
     color: idx+1
     for idx, colors in enumerate(CLASS_CHANNEL_LIST)
     for color in colors
 }
+
+print(CLASS_CHANNEL_MAP[145])
 
 CHANNEL_NUM = len(CLASS_CHANNEL_LIST) + 2
 

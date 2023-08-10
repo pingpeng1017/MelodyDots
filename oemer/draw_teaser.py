@@ -29,6 +29,7 @@ def teaser() -> Image:
     clefs = layers.get_layer('clefs') # 음자리표
     sfns = layers.get_layer('sfns') # 샾, 플랫, 내츄럴
     rests = layers.get_layer('rests') # 쉼표
+    timesigs = layers.get_layer('timesigs') # 박자표
     
     global out
     out = np.copy(ori_img).astype(np.uint8) # 출력 이미지(out)를 원본 이미지로 초기화
@@ -40,6 +41,8 @@ def teaser() -> Image:
     draw_bbox([s.bbox for s in sfns if s.note_id is None], color=(90, 0, 168), labels=[str(s.label.name) for s in sfns if s.note_id is None]) # 보라색
     draw_bbox([c.bbox for c in clefs], color=(235, 64, 52), labels=[c.label.name for c in clefs]) # 빨간색
     draw_bbox([r.bbox for r in rests], color=(12, 145, 0), labels=[r.label.name for r in rests]) # 초록색
+    draw_bbox([t.bbox for t in timesigs], color=(255, 192, 203), labels=[str(t.label.name) for t in timesigs]) # 분홍색
+
 
     for note in notes:
         if note.label is not None:

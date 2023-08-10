@@ -5,7 +5,7 @@ CLASS_CHANNEL_LIST = [
         64, 58, 60, 66, 63, 69, 68, 61, 62, 67, 65, 59, 146,  # flags, beam
         97, 100, 99, 98, 101, 102, 103, 104, 96, 163,  # rests
         80, 78, 79, 74, 70, 72, 76, 3,  # sharp, flat, natural, barline
-        10, 13, 12, 19, 11, 20, 51, # clefs, augmentationDot, 
+        10, 13, 12, 19, 11, 20, 51, # clefs, augmentationDot
         25, 24, 29, 22, 23, 28, 27, 34, 30, 21, 33, 26,  # timeSigs
     ]
 ]

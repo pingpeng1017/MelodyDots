@@ -32,7 +32,7 @@ NOTE_TYPE_TO_RHYTHM = {
     NoteType.EIGHTH: {"name": "eighth", "duration": DIVISION_PER_QUATER // 2},
     NoteType.SIXTEENTH: {"name": "16th", "duration": DIVISION_PER_QUATER // 4},
     NoteType.THIRTY_SECOND: {"name": "32nd", "duration": DIVISION_PER_QUATER // 8},
-    NoteType.SIXTY_FOURTH: {"name": "64th", "duration": DIVISION_PER_QUATER // 16}
+    NoteType.SIXTY_FOURTH: {"name": "64th", "duration": DIVISION_PER_QUATER // 16},
 }
 
 REST_TYPE_TO_DURATION = {
