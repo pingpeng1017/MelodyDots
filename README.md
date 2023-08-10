@@ -15,8 +15,8 @@
 
 ### 프로젝트 구조  
 
-  <p align="left">
-    <img src="https://github.com/pingpeng1017/MelodyDots/assets/97069558/075220f6-7c99-43b9-83f6-5024836e4cc4">
+  <p align="center">
+    <img src="https://github.com/pingpeng1017/MelodyDots/assets/97069558/a539de15-968a-420c-9f5a-8f835b3776e0">
   </p>
   
 ### 팀 소개
