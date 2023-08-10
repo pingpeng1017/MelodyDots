@@ -33,3 +33,5 @@ pip install .
 # docs/images 폴더에 이미지 파일을 넣어주고, 다음 명령어를 실행한다.
 oemer --use-tf --without-deskew <이미지 경로>
 ```
+
+https://github.com/pingpeng1017/MelodyDots/issues/1#issue-1844313410
