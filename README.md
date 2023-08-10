@@ -1,7 +1,7 @@
 # MelodyDots🎶
 
   <p align="center">
-    <img src="https://github.com/pingpeng1017/MelodyDots/assets/97069558/b2530d76-819f-4da2-92d2-b5c217910943">
+    <img src="https://github.com/pingpeng1017/MelodyDots/assets/97069558/306d898c-a4fb-4ad7-b3ab-e5d3ef83ecb0">
   </p>
   
 ### 프로젝트 개요
